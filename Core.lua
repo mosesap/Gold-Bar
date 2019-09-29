@@ -12,6 +12,8 @@ for i = 1, NUM_CHAT_WINDOWS do
     _G['ChatFrame'..i..'EditBox']:SetAltArrowKeyMode(false)
 end
 -------------------------------------------------------------
+--REGION LOCAL MEMBER VARIABLES
+local prev_energy = 0
 --REGION INITIALIZE ON LOGIN
 local AuBar = CreateFrame('StatusBar', 'AuBar', UIParent)
 AuBar:SetSize(300,360)
@@ -31,7 +33,6 @@ function AuBar.PLAYER_LOGIN(self, event)
 end
 
 --REGION EVENT HANDLERS
-local prev_energy = 0
 function AuBar.UNIT_POWER_UPDATE(self, event, unit, powertype)
     local unit_energy = UnitPower("player")
     if unit_energy ~= prev_energy then
