@@ -39,3 +39,4 @@ function AuBar.UNIT_POWER_UPDATE(self, event, unit, powertype)
     end
     prev_energy = unit_energy
 end
+--comment commment comment asdfasdf

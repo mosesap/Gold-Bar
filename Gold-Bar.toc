@@ -1,0 +1,8 @@
+## Interface: 11300
+## Title: |cFFFFD700Gold|r Bar
+## Author: mosesap
+## DefaultState: enabled
+## SavedVariables: objGoldBar
+
+Template.xml
+Core.lua
