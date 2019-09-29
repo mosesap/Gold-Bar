@@ -12,12 +12,30 @@ for i = 1, NUM_CHAT_WINDOWS do
     _G['ChatFrame'..i..'EditBox']:SetAltArrowKeyMode(false)
 end
 -------------------------------------------------------------
-local function HelloWorld(a)
-    a = a or 'Good Bye World'
-    print(a)
+--REGION INITIALIZE ON LOGIN
+local AuBar = CreateFrame('StatusBar', 'AuBar', UIParent)
+AuBar:SetSize(300,360)
+AuBar:SetPoint('Center', UIParent, 'Center')
+--generic scipt caller, calls appropiate function on event
+AuBar:SetScript("OnEvent", function(self, event, ...)
+    --print(event, unpack{...})
+	return self[event](self, event, ...)
+end)
+AuBar:RegisterEvent("PLAYER_LOGIN")
+AuBar:RegisterEvent("PLAYER_LOGOUT")
+
+function AuBar.PLAYER_LOGIN(self, event)
+    print("welcome ", UnitName("player").."!")
+    self:RegisterEvent("UNIT_POWER_UPDATE")
+    self:UNIT_POWER_UPDATE(nil, "player", "ENERGY")
 end
 
-local UIConfig = CreateFrame('Frame', 'Au_Bar')--, UIParent, 'BasicFrameTemplateWithInset')
-UIConfig:SetSize(300,360)
-UIConfig:SetPoint('Center', UIParent, 'Center')
-HelloWorld('Oh boy, here I go killing again')
+--REGION EVENT HANDLERS
+local prev_energy = 0
+function AuBar.UNIT_POWER_UPDATE(self, event, unit, powertype)
+    local unit_energy = UnitPower("player")
+    if unit_energy ~= prev_energy then
+        print(unit_energy)
+    end
+    prev_energy = unit_energy
+end

@@ -1,4 +1,4 @@
-## Interface: 113
+## Interface: 11300
 ## Title: |cFFFFD700Gold|r Bar
 ## Author: mosesap
 ## DefaultState: enabled
