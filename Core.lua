@@ -1,3 +1,6 @@
+-------------------------------------------------------------
+--REGION QUICK DEBUG
+-------------------------------------------------------------
 SLASH_RELOADUI1 = '/rl' -- for quicker reloading
 SlashCmdList.RELOADUI = ReloadUI
 
@@ -11,10 +14,17 @@ end
 for i = 1, NUM_CHAT_WINDOWS do
     _G['ChatFrame'..i..'EditBox']:SetAltArrowKeyMode(false)
 end
+
 -------------------------------------------------------------
---REGION LOCAL MEMBER VARIABLES
+--REGION MEMBER VARIABLES
+-------------------------------------------------------------
 local prev_energy = 0
---REGION INITIALIZE ON LOGIN
+local unit_energy = 0
+local prev_energy_tick = 0
+local tick_increment = 1.9
+-------------------------------------------------------------
+--REGION CREATE AUBAR FRAME
+-------------------------------------------------------------
 local AuBar = CreateFrame('StatusBar', 'AuBar', UIParent)
 AuBar:SetSize(300,360)
 AuBar:SetPoint('Center', UIParent, 'Center')
@@ -26,18 +36,33 @@ end)
 AuBar:RegisterEvent("PLAYER_LOGIN")
 AuBar:RegisterEvent("PLAYER_LOGOUT")
 
+-------------------------------------------------------------
+--REGION AUBAR EVENT HANDLERS
+-------------------------------------------------------------
 function AuBar.PLAYER_LOGIN(self, event)
-    print("welcome ", UnitName("player").."!")
-    self:RegisterEvent("UNIT_POWER_UPDATE")
-    self:UNIT_POWER_UPDATE(nil, "player", "ENERGY")
+        print("welcome ", UnitName("player").."!")
+        self:RegisterEvent("UNIT_POWER_UPDATE")
+        self:UNIT_POWER_UPDATE(nil, "player", "ENERGY")
+        
+        local TickerFrame = CreateFrame("Frame")
+        TickerFrame:SetScript("OnUpdate", TickerOnUpdate)
 end
 
---REGION EVENT HANDLERS
 function AuBar.UNIT_POWER_UPDATE(self, event, unit, powertype)
-    local unit_energy = UnitPower("player")
+    unit_energy = UnitPower("player")
     if unit_energy ~= prev_energy then
-        print(unit_energy)
+        --do something
     end
     prev_energy = unit_energy
 end
---comment commment comment asdfasdf
+
+function TickerOnUpdate(self)
+     unit_energy = UnitPower("player", PowerTypeIndex)
+    local now = GetTime()
+    if unit_energy > prev_energy or now >= prev_energy_tick + 2 then
+        prev_energy_tick = now
+        print("now")
+    end
+    --% game time and only increment the bar if the time has moved by > the increment
+    prev_energy = unit_energy
+end

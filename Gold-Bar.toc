@@ -4,5 +4,4 @@
 ## DefaultState: enabled
 ## SavedVariables: objGoldBar
 
-Template.xml
 Core.lua
