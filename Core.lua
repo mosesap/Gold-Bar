@@ -16,92 +16,55 @@ for i = 1, NUM_CHAT_WINDOWS do
 end
 
 -------------------------------------------------------------
---REGION MEMBER VARIABLES
+--REGION GLOBAL VARIABLES
 -------------------------------------------------------------
-local prev_energy = 0
-local unit_energy = 0
-local prev_energy_tick = 0
-
-local prev_time_tick = 0
-local tick_increment = 1
--------------------------------------------------------------
---REGION CREATE AUBAR FRAME
--------------------------------------------------------------
-local BaseFrame = CreateFrame('Frame', 'BaseFrame')
-BaseFrame:SetScript("OnEvent", function(self, event, ...)
-    --print(event, unpack{...})
-	return self[event](self, event, ...)
-end)
---BaseFrame:SetScript("OnUpdate", TickerOnUpdate)
-BaseFrame:RegisterEvent("PLAYER_LOGIN")
-BaseFrame:RegisterEvent("PLAYER_LOGOUT")
+local prev_nrg = 0
+local prev_tick = 0
 
 -------------------------------------------------------------
---REGION BASE FRAME EVENT HANDLERS
+--REGION FUNCTIONS
 -------------------------------------------------------------
-function BaseFrame.PLAYER_LOGIN(self, event)
-        print("welcome ", UnitName("player").."!")
-        if UnitName("player") == "Addontesta" then
-            self:RegisterEvent("UNIT_POWER_UPDATE")
-            self:UNIT_POWER_UPDATE(nil, "player", "ENERGY") 
-            local red = .5
-            local green = .5
-            local blue = .5
-            local opacity = 1
-            local tick = 0
-            local AuBar = CreateFrame("StatusBar", "AuBar", UIParent, "BasicFrameTemplateWithInset")
-            AuBar:SetScript("OnUpdate", TickerOnUpdate)
-            --AuBar:SetStatusBarColor(red, green, blue, opacity)
-            AuBar:SetSize(300,360)
-            AuBar:SetPoint("CENTER", UIParent, "CENTER")
-            --[[
-            local color = {0,1,0}
-            local statusbar = CreateFrame("StatusBar",nil,UIParent) --frameType, frameName, frameParent  
-            statusbar:SetPoint("CENTER",0,0)
-            statusbar:SetSize(200,20)
-            --statusbar background
-            statusbar.bg = statusbar:CreateTexture(nil,"BACKGROUND",nil,-8)
-            statusbar.bg:SetAllPoints(statusbar)
-            statusbar.bg:SetTexture(unpack(color))
-            statusbar.bg:SetAlpha(0.2)
-            --statusbar texture
-            local tex = statusbar:CreateTexture(nil,"BACKGROUND",nil,-6)
-            tex:SetTexture(unpack(color))
-            statusbar:SetStatusBarTexture(tex)
-            statusbar:SetStatusBarColor(unpack(color))
-            --values
-            statusbar:SetMinMaxValues(1, 100)
-            statusbar.minValue, statusbar.maxValue = statusbar:GetMinMaxValues()
-            statusbar:SetValue(50)]]
-            --try the above code for the statusbar
-            AuBar:Show() --idk if this is needed
-
-        end
+local function CreateBar(name, previous)
+	local f = CreateFrame("StatusBar", "Fizzle"..name, UIParent)
+	f:SetSize(200, 30)
+	if not previous then
+		f:SetPoint("LEfT", 10, 0)
+	else
+		f:SetPoint("TOP", previous, "BOTTOM")
+	end
+	f:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+	f.Text = f:CreateFontString()
+	f.Text:SetFontObject(GameFontNormal)
+	f.Text:SetPoint("CENTER")
+	f.Text:SetJustifyH("CENTER")
+	f.Text:SetJustifyV("CENTER")
+	return f
 end
 
-function BaseFrame.UNIT_POWER_UPDATE(self, event, unit, powertype)
-    unit_energy = UnitPower("player")
-    if unit_energy ~= prev_energy then
-        --do something
-    end
-    prev_energy = unit_energy
-end
-
--------------------------------------------------------------
---REGION AUBAR UPDATE HANDLER
--------------------------------------------------------------
-function TickerOnUpdate(self)
+local function UpdateTicker(self) 
+    local curr_nrg = UnitPower("player")
     local now = GetTime()
-    if now >= prev_energy_tick + 2 then
-        prev_energy_tick = now
-        prev_time_tick = now
-        print("now")
-        tick = 0
-        --self:SetValue(tick) --is self base frame or aubar?
-    elseif now >= prev_time_tick + tick_increment then
-        --print("tick")
-        tick = tick + tick_increment
-        --self:SetValue(tick) --is self base frame or aubar?
-        prev_time_tick = now
-    end     
+    local bar_tick = math.floor((now - prev_tick)  * 100)
+    if bar_tick > 190 or bar_tick < 10 then 
+        self:SetStatusBarColor(1, .1, .9) 
+    else 
+        self:SetStatusBarColor(255, 215, 0)
+    end
+    if now >= prev_tick + 2 or curr_nrg > prev_nrg then
+        prev_tick = now
+        bar_tick = 0 
+    end  
+    if curr_nrg + 20 < UnitPowerMax("player") then
+        self.Text:SetText(curr_nrg + 20)
+    else
+        self.Text:SetText(UnitPowerMax("player"))
+    end
+    prev_nrg = curr_nrg
+    self:SetValue(bar_tick)
 end
+
+local Au_Bar = CreateBar('GoldBar')
+Au_Bar:SetMinMaxValues(0, 200)
+Au_Bar:SetScript("OnUpdate", function(self, event, ...)
+    UpdateTicker(self)
+end)
