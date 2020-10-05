@@ -16,12 +16,6 @@ for i = 1, NUM_CHAT_WINDOWS do
 end
 
 -------------------------------------------------------------
---REGION GLOBAL VARIABLES
--------------------------------------------------------------
-local prev_nrg = 0
-local prev_tick = 0
-
--------------------------------------------------------------
 --REGION FUNCTIONS
 -------------------------------------------------------------
 local function CreateBar(name, previous)
@@ -44,14 +38,14 @@ end
 local function UpdateTicker(self) 
     local curr_nrg = UnitPower("player")
     local now = GetTime()
-    local bar_tick = math.floor((now - prev_tick)  * 100)
+    local bar_tick = math.floor((now - self.prev_tick)  * 100)
     if bar_tick > 190 or bar_tick < 10 then 
         self:SetStatusBarColor(1, .1, .9) 
     else 
         self:SetStatusBarColor(255, 215, 0)
     end
-    if now >= prev_tick + 2 or curr_nrg > prev_nrg then
-        prev_tick = now
+    if now >= self.prev_tick + 2 or curr_nrg > self.prev_nrg then
+        self.prev_tick = now
         bar_tick = 0 
     end  
     if curr_nrg + 20 < UnitPowerMax("player") then
@@ -59,12 +53,21 @@ local function UpdateTicker(self)
     else
         self.Text:SetText(UnitPowerMax("player"))
     end
-    prev_nrg = curr_nrg
+    self.prev_nrg = curr_nrg
     self:SetValue(bar_tick)
 end
 
-local Au_Bar = CreateBar('GoldBar')
-Au_Bar:SetMinMaxValues(0, 200)
-Au_Bar:SetScript("OnUpdate", function(self, event, ...)
-    UpdateTicker(self)
-end)
+if "Rogue" == UnitClass("player") or "Druid" == UnitClass("player") then
+    local Au_Bar = CreateBar('GoldBar')
+    Au_Bar:SetMinMaxValues(0, 200)
+    Au_Bar:SetMovable(true)
+    Au_Bar:EnableMouse(true)
+    Au_Bar:RegisterForDrag("LeftButton")
+    Au_Bar:SetScript("OnDragStart", Au_Bar.StartMoving)
+    Au_Bar:SetScript("OnDragStop", Au_Bar.StopMovingOrSizing)
+    Au_Bar.prev_nrg = 0
+    Au_Bar.prev_tick = 0
+    Au_Bar:SetScript("OnUpdate", function(self, event, ...)
+        UpdateTicker(self)
+    end)
+end
