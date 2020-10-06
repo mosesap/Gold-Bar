@@ -53,6 +53,7 @@ end
 
 if "Rogue" == UnitClass("player") or "Druid" == UnitClass("player") then
     local Au_Bar = CreateBar('GoldBar')
+    print("here")
     Au_Bar:SetMinMaxValues(0, 200)
     Au_Bar:SetMovable(true)
     Au_Bar:EnableMouse(true)
@@ -64,14 +65,14 @@ if "Rogue" == UnitClass("player") or "Druid" == UnitClass("player") then
     Au_Bar:SetScript("OnUpdate", function(self, event, ...)
         UpdateTicker(self)
     end)
-    if "Druid" == UnitClass("player") then
-        Au_Bar:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
-        Au_Bar:SetScript("OnEvent"), function(self, event, ...)
-            if event == "UPDATE_SHAPESHIFT_FORM" and 3 = GetShapeshiftForm() then
-               Au_Bar:Show()
-            elseif event == "UPDATE_SHAPESHIFT_FORM" and 3 ~= GetShapeshiftForm() then
-                Au_Bar:Hide()
-            end
-        end)
-    end
+    --if "Druid" == UnitClass("player") then
+    --    Au_Bar:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+    --    Au_Bar:SetScript("OnEvent"), function(self, event, ...)
+    --        if event == "UPDATE_SHAPESHIFT_FORM" and 3 = GetShapeshiftForm() then
+    --           Au_Bar:Show()
+    --        elseif event == "UPDATE_SHAPESHIFT_FORM" and 3 ~= GetShapeshiftForm() then
+    --            Au_Bar:Hide()
+    --        end
+    --    end)
+    --end
 end
