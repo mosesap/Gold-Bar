@@ -1,6 +1,3 @@
--------------------------------------------------------------
---REGION QUICK DEBUG
--------------------------------------------------------------
 SLASH_RELOADUI1 = '/rl' -- for quicker reloading
 SlashCmdList.RELOADUI = ReloadUI
 
@@ -15,9 +12,6 @@ for i = 1, NUM_CHAT_WINDOWS do
     _G['ChatFrame'..i..'EditBox']:SetAltArrowKeyMode(false)
 end
 
--------------------------------------------------------------
---REGION FUNCTIONS
--------------------------------------------------------------
 local function CreateBar(name, previous)
 	local f = CreateFrame("StatusBar", "Fizzle"..name, UIParent)
 	f:SetSize(200, 30)
@@ -70,4 +64,14 @@ if "Rogue" == UnitClass("player") or "Druid" == UnitClass("player") then
     Au_Bar:SetScript("OnUpdate", function(self, event, ...)
         UpdateTicker(self)
     end)
+    if "Druid" == UnitClass("player") then
+        Au_Bar:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+        Au_Bar:SetScript("OnEvent"), function(self, event, ...)
+            if event == "UPDATE_SHAPESHIFT_FORM" and 3 = GetShapeshiftForm() then
+               Au_Bar:Show()
+            elseif event == "UPDATE_SHAPESHIFT_FORM" and 3 ~= GetShapeshiftForm() then
+                Au_Bar:Hide()
+            end
+        end)
+    end
 end
