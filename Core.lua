@@ -10,7 +10,10 @@ local function CreateBar(name, type, texture, anchor)
 	frame.Text:SetFontObject(GameFontNormal)
 	frame.Text:SetPoint("CENTER")
 	frame.Text:SetJustifyH("CENTER")
-	frame.Text:SetJustifyV("CENTER")
+    frame.Text:SetJustifyV("CENTER")
+    frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    frame:SetAlpha(.5)
 	return frame
 end
 
@@ -47,6 +50,14 @@ local function ConfigureGoldBar(bar)
     bar:SetScript("OnUpdate", function(self, event, ...)
         UpdateBar(self)
     end)
+    bar:SetScript("OnEvent", function(self, event, ...)
+       if event == "PLAYER_REGEN_DISABLED" then
+            self:SetAlpha(1)
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            self:SetAlpha(.5)
+            --UIFrameFadeIn(self, 5, 1, .5)
+        end
+    end)
 end
 
 local function ConfigureComboBar(bar, point)
@@ -77,6 +88,11 @@ local function ConfigureComboBar(bar, point)
     bar:SetScript("OnEvent", function(self, event, ...)
         if event == "UNIT_POWER_UPDATE" then
             UpdateBar(self)
+        elseif event == "PLAYER_REGEN_DISABLED" then
+            self:SetAlpha(1)
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            self:SetAlpha(.5)
+            --UIFrameFadeIn(self, 5, 1, .5)
         end
     end)
     bar:RegisterEvent("UNIT_POWER_UPDATE")
